@@ -4,15 +4,20 @@ module.exports = {
 		"./components/**/*.{js,ts,jsx,tsx}",
 	],
 	theme: {
-		fontFamily: {
-			cursive: ["Courgette", "cursive"],
-		},
 		extend: {
+			colors: {
+				primary: "#78726d",
+			},
+			fontFamily: {
+				cursive: ["Courgette", "cursive"],
+				primary: ["Tittilium Web", "sans-serif"],
+				skinny: ["Bebas Neue", "cursive"],
+			},
 			width: {
-				100: "100px",
+				120: "120px",
 			},
 			height: {
-				100: "100px",
+				120: "120px",
 			},
 		},
 	},
