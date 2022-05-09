@@ -53,7 +53,7 @@ function Shop(props: JustText) {
 	return (
 		<>
 			<img
-				className="w-[min(9vh,64px)] aspect-square ml-2 mr-2"
+				className="w-[min(9vh,64px)] aspect-square ml-2 mr-2 select-none"
 				src="gold-bars.svg"
 			></img>
 			<span className="w-16 text-center font-cursive text-[min(2.8vh,25px)] text-gray-600">

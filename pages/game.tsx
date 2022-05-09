@@ -6,17 +6,21 @@ import Game from "../components/game/Game";
 import { auth, defaultFirestore, firestore } from "../lib/firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
-export default function Home(props: {}) {
-	const [user, loading, error] = useAuthState(auth);
-	const [votes, votesLoading, votesError] = useCollection(
-		firestore.collection(defaultFirestore, "votes"),
-		{}
+async function getData(...items: string[]) {
+	const result = await getDoc(
+		doc(defaultFirestore, items[0], ...items.slice(1))
 	);
+	return result.data();
+}
 
-	if (!votesLoading && votes) {
-		votes.docs.map((doc) => console.log(doc.data()));
-	}
+export interface GameProps {
+	money: string;
+}
+
+export default function Home(props: GameProps) {
+	console.log(useAuthState(auth));
 
 	return (
 		<>
@@ -27,18 +31,26 @@ export default function Home(props: {}) {
 					rel="stylesheet"
 				></link>
 				<link
-					href="https://fonts.googleapis.com/css2?family=Courgette&family=Titillium+Web&family=Bebas+Neue&display=swap"
+					href="https://fonts.googleapis.com/css2?family=Courgette&family=Titillium+Web&family=Bebas+Neue&family=PT+Sans+Narrow&display=swap"
 					rel="stylesheet"
 				></link>
 				<noscript>You need to enable javascript to run this app</noscript>
 			</Head>
-			<div className="flex w-screen h-screen">
+			<div className="flex w-screen h-screen overflow-hidden">
 				<SideBar></SideBar>
-				<main className="flex-grow flex flex-col gap-4 bg-primary">
+				<main className="flex-grow flex flex-col bg-primary">
 					<GameHeader></GameHeader>
-					<Game></Game>
+					<Game {...props}></Game>
 				</main>
 			</div>
 		</>
 	);
+}
+
+export async function getServerSideProps() {
+	return {
+		props: {
+			money: "100",
+		} as GameProps,
+	};
 }

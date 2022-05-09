@@ -1,7 +1,7 @@
 export default function GameHeader() {
 	return (
-		<div className="w-full h-48 flex flex-col">
-			<div className="w-full flex-grow flex items-center">
+		<div className="w-full flex flex-col">
+			<div className="w-full flex items-center">
 				<span className="text-[min(4vw,42px)] ml-5 font-skinny font-bold text-white">
 					$
 				</span>

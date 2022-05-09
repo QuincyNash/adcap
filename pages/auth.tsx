@@ -11,6 +11,8 @@ const uiConfig = {
 	],
 };
 
+console.log(uiConfig);
+
 function SignInScreen() {
 	return (
 		<div>
