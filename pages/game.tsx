@@ -1,6 +1,5 @@
 import Head from "next/head";
 import SideBar from "../components/game/SideBar";
-import GameHeader from "../components/game/GameHeader";
 import Game from "../components/game/Game";
 
 import { auth, defaultFirestore, firestore } from "../lib/firebase";
@@ -38,10 +37,7 @@ export default function Home(props: GameProps) {
 			</Head>
 			<div className="flex w-screen h-screen overflow-hidden">
 				<SideBar></SideBar>
-				<main className="flex-grow flex flex-col bg-primary">
-					<GameHeader></GameHeader>
-					<Game {...props}></Game>
-				</main>
+				<Game {...props}></Game>
 			</div>
 		</>
 	);
@@ -50,7 +46,7 @@ export default function Home(props: GameProps) {
 export async function getServerSideProps() {
 	return {
 		props: {
-			money: "100",
+			money: "1",
 		} as GameProps,
 	};
 }

@@ -45,6 +45,9 @@ module.exports = {
 		"border-gray-300",
 		"bg-orange-500",
 		"border-gray-400",
+		"opacity-80",
+		"transition-opacity",
+		"hover:opacity-100",
 	],
 	plugins: [],
 };

@@ -1,50 +1,63 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, RefObject, LegacyRef } from "react";
 import { BigInteger } from "jsbn";
 import MoneyMaker from "./MoneyMaker";
+import { Big, formatNum } from "./numUtils";
 import { GameProps } from "../../pages/game";
 
-function Big(value: string | number) {
-	return new BigInteger(value.toString());
-}
-
-function placeValue(num: BigInteger) {
-	num = num;
-
-	const simplePlaces = [
-		"million",
-		"billion",
-		"trillion",
-		"quadrillion",
-		"quintillion",
-		"sextillion",
-		"septillion",
-		"octillion",
-		"nonillion",
-		"decillion",
-	];
-}
-
-console.log(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-
 export default function Game(props: GameProps) {
-	const [money, setMoney] = useState(props.money);
+	function makeMoney(amount: string) {
+		money = money.add(Big(amount));
+		const [num, placeValue] = formatNum(money);
+		numRef.current.innerText = num;
+		placeRef.current.innerText = placeValue;
+	}
+
+	let money = Big(props.money);
+	const [num, placeValue] = formatNum(money);
+	const numRef: RefObject<HTMLSpanElement> = useRef();
+	const placeRef: RefObject<HTMLSpanElement> = useRef();
 
 	return (
-		<div className="w-full flex-grow flex justify-center">
-			<div className="w-5/6 h-[90%] grid gap-x-5 gap-y-4 grid-cols-game grid-rows-game">
-				{Array.from(Array(2)).map((_e, i) => (
-					<MoneyMaker
-						key={i}
-						altText=""
-						completion={0}
-						time={2}
-						automatic={true}
-						onCompletion={() => {
-							console.log("FINISH");
-						}}
-					></MoneyMaker>
-				))}
+		<main className="flex-grow flex flex-col bg-primary">
+			<div className="w-full flex flex-col">
+				<div className="w-full flex items-center">
+					<span className="text-[min(4vw,42px)] ml-5 font-skinny font-bold text-white">
+						$
+					</span>
+					<div>
+						<span
+							className="text-[min(7.2vw,76px)] ml-1 font-primary font-semibold text-white"
+							ref={numRef}
+						>
+							{num}
+						</span>
+						<span
+							className="text-[min(4.25vw,45px)] ml-[min(1.7vw,16px)] font-skinny uppercase text-white"
+							ref={placeRef}
+						>
+							{placeValue}
+						</span>
+					</div>
+				</div>
+				<div className="w-full h-14 bg-red-500"></div>
 			</div>
-		</div>
+			<div className="w-full flex-grow flex justify-center">
+				<div className="w-5/6 h-[90%] grid gap-x-5 gap-y-4 grid-cols-game grid-rows-game">
+					{Array.from(Array(10)).map((_e, i) => {
+						return (
+							<MoneyMaker
+								key={i}
+								altText=""
+								completion={0}
+								time={0.1}
+								moneyPerFinish={"1"}
+								makeMoney={makeMoney}
+								automatic={true}
+							></MoneyMaker>
+						);
+					})}
+				</div>
+			</div>
+		</main>
 	);
 }

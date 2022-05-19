@@ -1,20 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, createRef, RefObject } from "react";
 import ReactDOM, { flushSync } from "react-dom";
+import { Big } from "./numUtils";
 
 interface MoneyMakerProps {
 	altText: string;
 	completion: number;
 	automatic: boolean;
 	time: number;
-	onCompletion: () => void;
-}
-
-function usePrevious(value: any) {
-	const ref = useRef();
-	useEffect(() => {
-		ref.current = value;
-	}, [value]);
-	return ref.current;
+	moneyPerFinish: string;
+	makeMoney: (amount: string) => void;
 }
 
 function getInterval(time: number) {
@@ -22,83 +16,98 @@ function getInterval(time: number) {
 	return interval === 0 ? 1000 : interval;
 }
 
-export default function MoneyMaker(props: MoneyMakerProps) {
-	const isFast = props.time < 0.15;
+function formatTime(time: number) {
+	const roundedTime = Math.ceil(time);
 
-	const [behind, setBehind] = useState(0);
-	const [start, setStart] = useState(performance.now());
-	const [timeBehind, setTimeBehind] = useState(0);
-	const [timeStart, setTimeStart] = useState(performance.now());
-
-	const [percentage, setPercentage] = useState(isFast ? 100 : props.completion);
-	const [firstUpdate, setFirstUpdate] = useState(false);
-
-	const [time, setTime] = useState((props.time * (100 - percentage)) / 100);
-	const actualTime = Math.ceil(time - 1);
-
-	let transitionDuration: number | string =
-		props.time * ((100 - (usePrevious(percentage) ?? percentage)) / 100);
-
-	if (transitionDuration === 0) {
-		transitionDuration = "0.01ms";
-	} else if (props.automatic && !firstUpdate) {
-		transitionDuration = `${transitionDuration - behind}s`;
-	} else {
-		transitionDuration = `${transitionDuration}s`;
-	}
-
-	const hours = Math.floor(actualTime / 3600);
-	const minutes = Math.floor(actualTime / 60) - hours * 60;
-	const seconds = Math.floor(actualTime % 60);
+	const hours = Math.floor(roundedTime / 3600);
+	const minutes = Math.floor(roundedTime / 60) - hours * 60;
+	const seconds = Math.floor(roundedTime % 60);
 
 	const displayHours = hours.toString().padStart(2, "0");
 	const displayMinutes = minutes.toString().padStart(2, "0");
 	const displaySeconds = seconds.toString().padStart(2, "0");
-	const timeDisplay = `${displayHours}:${displayMinutes}:${displaySeconds}`;
 
-	let previousTime: number = (usePrevious(time) as number) % 1;
-	previousTime = previousTime === 0 ? 1 : previousTime;
+	return `${displayHours}:${displayMinutes}:${displaySeconds}`;
+}
+
+export default function MoneyMaker(props: MoneyMakerProps) {
+	const progressRef: RefObject<HTMLDivElement> = useRef();
+	const timeRef: RefObject<HTMLSpanElement> = useRef();
+
+	const isFast = props.time < 0.15;
+	const moneyPerSecond = Big(props.moneyPerFinish).divide(Big(props.time));
+	console.log(moneyPerSecond.toString(), props.moneyPerFinish, props.time);
+
+	let completion = isFast ? 100 : props.completion;
+	let time = (props.time * (100 - completion)) / 100;
+	let going = props.automatic ? true : completion === 0 ? false : true;
+
+	const timeDisplay = formatTime(time);
 
 	useEffect(() => {
-		if (percentage !== 0 || props.automatic) {
-			setPercentage(100);
-			setTimeout(() => setTime(actualTime), getInterval(time));
+		let lastTime = performance.now();
+
+		function update() {
+			let currentTime = performance.now();
+
+			if ((going || props.automatic) && !isFast) {
+				(() => {
+					let dt = (currentTime - lastTime) / 1000;
+					let increase = (100 * dt) / props.time;
+					completion += increase;
+					time -= dt;
+
+					if (completion > 100) {
+						if (!isFast || !props.automatic) {
+							props.makeMoney(props.moneyPerFinish);
+						}
+
+						if (!props.automatic) {
+							completion = 0;
+							time = props.time;
+							going = false;
+						} else {
+							completion %= 100;
+							time = (props.time * (100 - completion)) / 100;
+						}
+					}
+
+					progressRef.current.style.transform = `translateX(${
+						completion - 100
+					}%)`;
+					timeRef.current.innerText = formatTime(time);
+				})();
+			}
+
+			lastTime = currentTime;
+			requestAnimationFrame(update);
 		}
-	}, []);
 
-	useEffect(() => {
-		if (props.automatic || percentage === 100) {
-			let current = performance.now();
-
-			let timeTook = current - timeStart;
-			let newBehind = timeTook - previousTime * 1000;
-			newBehind = isNaN(newBehind) ? 0 : newBehind;
-
-			let interval = getInterval(time);
-
-			setTimeStart(current);
-			setTimeout(() => {
-				if (actualTime > 0) {
-					setTime(actualTime);
-					setTimeBehind(newBehind);
-				}
-			}, interval - (newBehind % props.time));
-		}
-	}, [actualTime]);
+		requestAnimationFrame(update);
+	});
 
 	return (
-		<div className="w-full h-full flex">
+		<div className="w-full h-full flex 2.5rem + 1/4 1/3 - 1/12 - 2.5rem">
 			<button
 				className="aspect-square h-full"
+				tabIndex={props.automatic ? -1 : 0}
+				style={{
+					cursor: props.automatic ? "default" : "pointer",
+				}}
 				onClick={() => {
-					if (!props.automatic && percentage !== 100) {
-						setPercentage(100);
-						setTimeStart(performance.now());
-						setTimeout(() => setTime(actualTime), getInterval(time));
+					if (!props.automatic && !going) {
+						going = true;
 					}
 				}}
 			>
-				<div className="relative h-full aspect-square rounded-full border-2 border-black bg-blue-100">
+				<div
+					className={
+						"relative h-full aspect-square rounded-full border-2 border-black  bg-blue-100" +
+						(props.automatic
+							? ""
+							: " opacity-80 transition-opacity hover:opacity-100")
+					}
+				>
 					<img
 						className="w-full h-full select-none"
 						src="person.svg"
@@ -114,35 +123,10 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 			<div className="flex-grow flex flex-col ml-2">
 				<div className="relative w-full h-1/2 overflow-hidden bg-slate-600">
 					<div
-						className="w-full h-full transition-transform ease-linear transform-gpu bg-blue-300"
-						onTransitionEnd={() => {
-							if (isFast && props.automatic) return;
-
-							if (percentage === 0 && props.automatic) {
-								setPercentage(100);
-								setStart(performance.now());
-							} else {
-								props.onCompletion();
-
-								let timeTook = performance.now() - start;
-								let newBehind = timeTook / 1000 - props.time;
-								newBehind = isNaN(newBehind) ? 0 : newBehind;
-
-								setTimeBehind(0);
-								setBehind((behind + newBehind) % props.time);
-								setFirstUpdate(true);
-
-								ReactDOM.flushSync(() => {
-									setTime(props.time);
-								});
-								ReactDOM.flushSync(() => {
-									setPercentage(0);
-								});
-							}
-						}}
+						className="w-full h-full bg-blue-300"
+						ref={progressRef}
 						style={{
-							transform: `translateX(-${100 - percentage}%)`,
-							transitionDuration,
+							transform: `translateX(-${100 - completion}%)`,
 						}}
 					>
 						{isFast && props.automatic && (
@@ -159,7 +143,7 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 					<div className="absolute top-0 left-full -translate-x-full not-left-tri w-6 h-full z-50 bg-primary"></div>
 				</div>
 				<div className="w-full h-1/2 flex mt-1">
-					<button className="flex-grow flex items-center rounded-md bg-blue-200">
+					<button className="flex-grow flex items-center rounded-md overflow-hidden opacity-80 transition-opacity bg-blue-200 hover:opacity-100">
 						<div className="h-full text-left leading-[3vh]">
 							<span className="ml-1 text-[1.5vw] font-cursive">Buy</span>
 							<br></br>
@@ -174,7 +158,10 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 						</div>
 					</button>
 					<div className="w-[max(25%,100px)] flex-center rounded-md ml-2 bg-gray-400">
-						<span className="text-white text-[max(1.8vw,20px)] leading-none font-skinny">
+						<span
+							className="text-white text-[max(1.8vw,20px)] leading-none font-skinny"
+							ref={timeRef}
+						>
 							{timeDisplay}
 						</span>
 					</div>
