@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef, createRef, RefObject } from "react";
-import ReactDOM, { flushSync } from "react-dom";
+import { useEffect, useRef, RefObject } from "react";
 import { Big } from "./numUtils";
 
 interface MoneyMakerProps {
@@ -35,8 +34,7 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 	const timeRef: RefObject<HTMLSpanElement> = useRef();
 
 	const isFast = props.time < 0.15;
-	const moneyPerSecond = Big(props.moneyPerFinish).divide(Big(props.time));
-	console.log(moneyPerSecond.toString(), props.moneyPerFinish, props.time);
+	const moneyPerSecond = Big(props.moneyPerFinish).div(Big(props.time));
 
 	let completion = isFast ? 100 : props.completion;
 	let time = (props.time * (100 - completion)) / 100;
@@ -50,9 +48,14 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 		function update() {
 			let currentTime = performance.now();
 
-			if ((going || props.automatic) && !isFast) {
+			if (going || props.automatic) {
 				(() => {
 					let dt = (currentTime - lastTime) / 1000;
+
+					if (isFast) {
+						return props.makeMoney(moneyPerSecond.times(dt).toString());
+					}
+
 					let increase = (100 * dt) / props.time;
 					completion += increase;
 					time -= dt;
@@ -75,6 +78,7 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 					progressRef.current.style.transform = `translateX(${
 						completion - 100
 					}%)`;
+
 					timeRef.current.innerText = formatTime(time);
 				})();
 			}

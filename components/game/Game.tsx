@@ -1,12 +1,11 @@
-import { useEffect, useState, useRef, RefObject, LegacyRef } from "react";
-import { BigInteger } from "jsbn";
+import { useRef, RefObject } from "react";
 import MoneyMaker from "./MoneyMaker";
 import { Big, formatNum } from "./numUtils";
 import { GameProps } from "../../pages/game";
 
 export default function Game(props: GameProps) {
 	function makeMoney(amount: string) {
-		money = money.add(Big(amount));
+		money = money.plus(Big(amount));
 		const [num, placeValue] = formatNum(money);
 		numRef.current.innerText = num;
 		placeRef.current.innerText = placeValue;
@@ -14,6 +13,7 @@ export default function Game(props: GameProps) {
 
 	let money = Big(props.money);
 	const [num, placeValue] = formatNum(money);
+
 	const numRef: RefObject<HTMLSpanElement> = useRef();
 	const placeRef: RefObject<HTMLSpanElement> = useRef();
 
