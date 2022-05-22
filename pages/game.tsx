@@ -1,25 +1,48 @@
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import { getAuth, signInAnonymously } from "firebase/auth";
+import { useRouter } from "next/router";
+import initApp from "../lib/firebase-client";
 import SideBar from "../components/game/SideBar";
 import Game from "../components/game/Game";
-
-import { auth, defaultFirestore, firestore } from "../lib/firebase";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-
-async function getData(...items: string[]) {
-	const result = await getDoc(
-		doc(defaultFirestore, items[0], ...items.slice(1))
-	);
-	return result.data();
-}
 
 export interface GameProps {
 	money: string;
 }
 
+interface UserData {
+	hello: string;
+}
+
 export default function Home(props: GameProps) {
-	console.log(useAuthState(auth));
+	const router = useRouter();
+
+	useEffect(() => {
+		initApp();
+
+		const auth = getAuth();
+
+		auth.onAuthStateChanged(async (user) => {
+			if (user) {
+				const token = await user.getIdToken();
+
+				const response = await fetch("/api/user", {
+					method: "GET",
+					headers: {
+						Authorization: token,
+					},
+				});
+				response
+					.json()
+					.then((data: UserData) => {
+						console.log(data);
+					})
+					.catch((err) => router.push("/auth"));
+			} else {
+				router.push("/auth");
+			}
+		});
+	}, []);
 
 	return (
 		<>

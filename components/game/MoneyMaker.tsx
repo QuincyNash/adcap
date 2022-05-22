@@ -93,7 +93,7 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 	return (
 		<div className="w-full h-full flex 2.5rem + 1/4 1/3 - 1/12 - 2.5rem">
 			<button
-				className="aspect-square h-full"
+				className="aspect-square h-full group"
 				tabIndex={props.automatic ? -1 : 0}
 				style={{
 					cursor: props.automatic ? "default" : "pointer",
@@ -106,10 +106,10 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 			>
 				<div
 					className={
-						"relative h-full aspect-square rounded-full border-2 border-black  bg-blue-100" +
+						"relative h-full aspect-square rounded-full z-50 border-2 border-black  bg-blue-100" +
 						(props.automatic
 							? ""
-							: " opacity-80 transition-opacity hover:opacity-100")
+							: " opacity-80 transition-opacity hover:opacity-100 group-focus-visible:opacity-100")
 					}
 				>
 					<img
@@ -143,11 +143,11 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 							></div>
 						)}
 					</div>
-					<div className="absolute top-0 left-tri w-6 h-full z-50 bg-primary"></div>
-					<div className="absolute top-0 left-full -translate-x-full not-left-tri w-6 h-full z-50 bg-primary"></div>
+					<div className="absolute top-0 left-tri w-6 h-full z-40 bg-primary"></div>
+					<div className="absolute top-0 left-full -translate-x-full not-left-tri w-6 h-full z-40 bg-primary"></div>
 				</div>
 				<div className="w-full h-1/2 flex mt-1">
-					<button className="flex-grow flex items-center rounded-md overflow-hidden opacity-80 transition-opacity bg-blue-200 hover:opacity-100">
+					<button className="flex-grow flex items-center rounded-md overflow-hidden opacity-80 transition-opacity bg-blue-200 hover:opacity-100 focus-visible:opacity-100">
 						<div className="h-full text-left leading-[3vh]">
 							<span className="ml-1 text-[1.5vw] font-cursive">Buy</span>
 							<br></br>
@@ -156,7 +156,7 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 						<div className="ml-auto text-right leading-[2.5vh]">
 							<span className="mr-1 text-[1.8vw] font-primary">15.129</span>
 							<br />
-							<span className="mr-1 md:text-[1.1vw] font-bold font-skinny2">
+							<span className="mr-1 text-[1.1vw] font-bold font-skinny2">
 								million
 							</span>
 						</div>

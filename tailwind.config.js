@@ -48,6 +48,7 @@ module.exports = {
 		"opacity-80",
 		"transition-opacity",
 		"hover:opacity-100",
+		"group-focus-within:opacity-100",
 	],
 	plugins: [],
 };

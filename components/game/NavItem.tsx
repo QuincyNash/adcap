@@ -20,7 +20,7 @@ export default function NavItem(props: NavItemProps) {
 
 	return (
 		<button
-			className="w-4/5 h-[6%] flex items-center overflow-hidden rounded-md bg-gray-50 transition-colors duration-100 hover:bg-orange-200"
+			className="w-4/5 h-[6%] flex items-center overflow-hidden rounded-md bg-gray-50 transition-colors duration-100 hover:bg-orange-200 focus-visible:bg-orange-200"
 			onClick={props.onClick}
 		>
 			{isShop ? (

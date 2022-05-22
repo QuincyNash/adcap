@@ -1,11 +1,16 @@
 import ProfilePicture from "./ProfilePicture";
 import NavItem from "./NavItem";
+import { signOut, getAuth } from "firebase/auth";
 
 export default function SideBar() {
 	return (
 		<nav className="w-60 h-full bg-gray-600">
 			<ul className="w-full h-full flex-center flex-col gap-[3%]">
-				<ProfilePicture onClick={() => {}}></ProfilePicture>
+				<ProfilePicture
+					onClick={() => {
+						signOut(getAuth());
+					}}
+				></ProfilePicture>
 				<NavItem text="Account" onClick={() => {}}></NavItem>
 				<NavItem text="Unlocks" onClick={() => {}}></NavItem>
 				<NavItem text="Upgrades" onClick={() => {}}></NavItem>

@@ -21,3 +21,7 @@
 		calc(100% + 1px) -1px
 	);
 }
+
+img {
+	pointer-events: none;
+}

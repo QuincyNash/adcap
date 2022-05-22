@@ -49,10 +49,10 @@ export default function Game(props: GameProps) {
 								key={i}
 								altText=""
 								completion={0}
-								time={0.1}
+								time={10}
 								moneyPerFinish={"1"}
 								makeMoney={makeMoney}
-								automatic={true}
+								automatic={false}
 							></MoneyMaker>
 						);
 					})}
