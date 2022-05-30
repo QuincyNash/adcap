@@ -1,7 +1,15 @@
 import { useRef, RefObject } from "react";
+import Loader from "../auth/Loader";
 import MoneyMaker from "./MoneyMaker";
+import { UserData } from "../../pages/game";
 import { Big, formatNum } from "./numUtils";
-import { GameProps } from "../../pages/game";
+import { User } from "firebase/auth";
+
+interface GameProps {
+	loading: boolean;
+	user: User;
+	userData: UserData;
+}
 
 export default function Game(props: GameProps) {
 	function makeMoney(amount: string) {
@@ -11,7 +19,7 @@ export default function Game(props: GameProps) {
 		placeRef.current.innerText = placeValue;
 	}
 
-	let money = Big(props.money);
+	let money = Big(props.userData.money);
 	const [num, placeValue] = formatNum(money);
 
 	const numRef: RefObject<HTMLSpanElement> = useRef();
@@ -44,15 +52,18 @@ export default function Game(props: GameProps) {
 			<div className="w-full flex-grow flex justify-center">
 				<div className="w-5/6 h-[90%] grid gap-x-5 gap-y-4 grid-cols-game grid-rows-game">
 					{Array.from(Array(10)).map((_e, i) => {
+						const business = props.userData.businesses[i];
+
 						return (
 							<MoneyMaker
 								key={i}
-								altText=""
-								completion={0}
-								time={10}
-								moneyPerFinish={"1"}
+								user={props.user}
+								altText={business.name}
+								completion={business.completion}
+								time={business.time}
+								moneyPerFinish={business.profit}
 								makeMoney={makeMoney}
-								automatic={false}
+								automatic={business.automatic}
 							></MoneyMaker>
 						);
 					})}

@@ -9,6 +9,7 @@ export default function database() {
 				privateKey: process.env.NEXT_PRIVATE_FIREBASE_KEY,
 				clientEmail: process.env.NEXT_PRIVATE_FIREBASE_CLIENT_EMAIL,
 			}),
+			storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 		});
 	}
 

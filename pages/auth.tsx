@@ -1,6 +1,11 @@
 import React from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import { GoogleAuthProvider, EmailAuthProvider, getAuth } from "firebase/auth";
+import {
+	GoogleAuthProvider,
+	EmailAuthProvider,
+	getAuth,
+	GithubAuthProvider,
+} from "firebase/auth";
 import initApp from "../lib/firebase-client";
 
 initApp();
@@ -9,6 +14,7 @@ const uiConfig = {
 	signInSuccessUrl: "/game",
 	signInOptions: [
 		GoogleAuthProvider.PROVIDER_ID,
+		GithubAuthProvider.PROVIDER_ID,
 		EmailAuthProvider.PROVIDER_ID,
 	],
 };

@@ -16,9 +16,14 @@ module.exports = {
 			},
 			screens: {
 				md: "910px",
+				"login-wrap": "494px",
+				"signup-wrap": "477px",
 			},
 			colors: {
 				primary: "#78726d",
+				"blue-primary": "#1089ff",
+				"transparent-black": "rgba(0,0,0,0.1)",
+				overlay: "rgba(0,0,0,0.5)",
 			},
 			fontFamily: {
 				cursive: ["Courgette", "cursive"],

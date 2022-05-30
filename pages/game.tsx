@@ -1,21 +1,51 @@
 import Head from "next/head";
+import admin from "firebase-admin";
 import { useEffect, useState } from "react";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { useRouter } from "next/router";
 import initApp from "../lib/firebase-client";
+import defaultUserData from "../lib/default-entry";
 import SideBar from "../components/game/SideBar";
 import Game from "../components/game/Game";
+import Loader from "../components/auth/Loader";
+import { ActionRequest } from "./api/action";
 
-export interface GameProps {
+export interface BusinessData {
+	name: string;
+	profit: string;
+	time: number;
+	automatic: boolean;
+	completion: number;
+}
+
+export interface Action {
+	business?: string;
+	actionType?: string;
+	timeStamp: TimeStamp;
+}
+
+export interface TimeStamp {
+	seconds: number;
+	nanoseconds: number;
+}
+
+export interface UserData {
+	photo: string;
 	money: string;
+	lastRequest: number;
+	queue: { [key: number]: Action };
+	businesses: BusinessData[];
 }
 
-interface UserData {
-	hello: string;
-}
-
-export default function Home(props: GameProps) {
+export default function Home() {
 	const router = useRouter();
+
+	let defaultUser = new Object(defaultUserData);
+	defaultUser["photo"] = "person.svg";
+
+	const [loading, setLoading] = useState(true);
+	const [userData, setUserData] = useState(defaultUser as UserData);
+	const [user, setUser] = useState(null);
 
 	useEffect(() => {
 		initApp();
@@ -26,20 +56,41 @@ export default function Home(props: GameProps) {
 			if (user) {
 				const token = await user.getIdToken();
 
+				await fetch("api/update", {
+					method: "GET",
+					headers: {
+						Authorization: token,
+					},
+				});
+
+				setInterval(async () => {
+					fetch("api/update", {
+						method: "GET",
+						headers: {
+							Authorization: await user.getIdToken(),
+						},
+					});
+				}, 30000);
+
 				const response = await fetch("/api/user", {
 					method: "GET",
 					headers: {
 						Authorization: token,
 					},
 				});
+
 				response
 					.json()
-					.then((data: UserData) => {
+					.then(async (data: UserData) => {
 						console.log(data);
+
+						setUserData(data);
+						setLoading(false);
+						setUser(user);
 					})
-					.catch((err) => router.push("/auth"));
+					.catch((err) => router.push("/login"));
 			} else {
-				router.push("/auth");
+				router.push("/login");
 			}
 		});
 	}, []);
@@ -58,18 +109,17 @@ export default function Home(props: GameProps) {
 				></link>
 				<noscript>You need to enable javascript to run this app</noscript>
 			</Head>
-			<div className="flex w-screen h-screen overflow-hidden">
-				<SideBar></SideBar>
-				<Game {...props}></Game>
+			<Loader visible={loading}></Loader>
+			<div
+				className="flex w-screen h-screen overflow-hidden"
+				style={{
+					opacity: loading ? "0.15" : "1",
+					pointerEvents: loading ? "none" : "all",
+				}}
+			>
+				<SideBar loading={loading} photo={userData.photo}></SideBar>
+				<Game userData={userData} user={user} loading={loading}></Game>
 			</div>
 		</>
 	);
-}
-
-export async function getServerSideProps() {
-	return {
-		props: {
-			money: "1",
-		} as GameProps,
-	};
 }

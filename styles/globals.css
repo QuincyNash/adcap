@@ -8,6 +8,60 @@
 	@apply items-center;
 }
 
+.form-element {
+	@apply border;
+	@apply border-transparent-black;
+	@apply rounded-md;
+	@apply placeholder:text-[#6c757d];
+	@apply p-3;
+	@apply border;
+	@apply focus:border-blue-primary;
+	@apply outline-none;
+	@apply transition-colors;
+}
+
+.google-signin {
+	@apply form-element;
+	@apply w-1/2;
+	@apply inline-block;
+	@apply mr-1;
+	@apply text-sm;
+	@apply font-semibold;
+	@apply text-[#757575];
+	@apply hover:shadow-md;
+	@apply focus:shadow-lg;
+	@apply !transition-shadow;
+}
+
+.github-signin {
+	@apply form-element;
+	@apply w-1/2;
+	@apply inline-block;
+	@apply ml-1;
+	@apply text-sm;
+	@apply font-semibold;
+	@apply text-white;
+	@apply bg-[#333333];
+	@apply shadow-lg;
+	@apply shadow-transparent;
+	@apply hover:shadow-gray-400;
+	@apply focus:shadow-gray-400;
+	@apply !transition-shadow;
+}
+
+.form-submit {
+	@apply form-element;
+	@apply text-white;
+	@apply bg-blue-primary;
+	@apply transition-colors;
+	@apply hover:bg-blue-600;
+	@apply hover:border-blue-300;
+	@apply hover:shadow-md;
+	@apply focus:bg-blue-600;
+	@apply focus:border-blue-300;
+	@apply focus:shadow-md;
+}
+
 .left-tri {
 	clip-path: polygon(-1px 0, 100% 50%, -1px 100%);
 }

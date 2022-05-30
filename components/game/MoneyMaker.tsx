@@ -1,7 +1,10 @@
+import { User } from "firebase/auth";
 import { useEffect, useRef, RefObject } from "react";
+import { ActionRequest } from "../../pages/api/action";
 import { Big } from "./numUtils";
 
 interface MoneyMakerProps {
+	user: User;
 	altText: string;
 	completion: number;
 	automatic: boolean;
@@ -98,7 +101,18 @@ export default function MoneyMaker(props: MoneyMakerProps) {
 				style={{
 					cursor: props.automatic ? "default" : "pointer",
 				}}
-				onClick={() => {
+				onClick={async () => {
+					await fetch("api/action", {
+						method: "POST",
+						headers: {
+							Authorization: await props.user.getIdToken(),
+						},
+						body: JSON.stringify({
+							actionType: "profit",
+							business: "Lemonade Stands",
+						} as ActionRequest),
+					});
+
 					if (!props.automatic && !going) {
 						going = true;
 					}
