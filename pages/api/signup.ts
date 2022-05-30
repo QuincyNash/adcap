@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import isBase64 from "is-base64";
 import stream from "stream";
 import path from "path";
-import { getExtension } from "mime";
+import mime from "mime";
 import { readFileSync } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import defaultUserData from "../../lib/default-entry";
@@ -81,7 +81,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 					.then(() => {
 						const bucket = admin.storage().bucket();
 
-						const ext = getExtension(photoMime);
+						const ext = mime.getExtension(photoMime);
 						const filename = `${user.uid}.${ext}`;
 						const file = bucket.file(filename);
 
