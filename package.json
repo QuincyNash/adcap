@@ -9,6 +9,7 @@
 		"@emotion/react": "^11.9.0",
 		"@emotion/styled": "^11.8.1",
 		"@mui/material": "^5.8.1",
+		"@types/mime": "^2.0.3",
 		"bignumber.js": "^9.0.2",
 		"firebase": "^9.6.11",
 		"firebase-admin": "^10.1.0",
